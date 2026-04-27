@@ -624,26 +624,32 @@
       font-weight: 700;
       background: rgba(255, 255, 255, 0.06);
       color: var(--muted);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .legend-item.tilde {
-      color: #e3f2ff;
-      background: rgba(97, 184, 255, 0.12);
+      color: #dcefff;
+      background: rgba(19, 38, 82, 0.95);
+      border-color: rgba(97, 184, 255, 0.92);
+      box-shadow: 0 0 0 3px rgba(97, 184, 255, 0.14);
     }
 
     .legend-item.listening {
       color: #dcfff6;
       background: rgba(31, 211, 178, 0.12);
+      border-color: rgba(31, 211, 178, 0.22);
     }
 
     .legend-item.gloss {
-      color: #deefff;
-      background: rgba(97, 184, 255, 0.18);
+      color: #071324;
+      background: linear-gradient(135deg, rgba(97, 184, 255, 0.96), rgba(164, 223, 255, 0.96));
+      border-color: rgba(164, 223, 255, 0.55);
     }
 
     .legend-item.spanglish-tone {
       color: #21180b;
       background: linear-gradient(135deg, rgba(255, 209, 102, 0.95), rgba(255, 122, 89, 0.95));
+      border-color: rgba(255, 209, 102, 0.42);
     }
 
     .video-box,
@@ -831,7 +837,6 @@
       <aside class="sidebar sticky-tools">
         <section class="panel card video-box">
           <h2>Vídeo</h2>
-          <p class="link-help">Pega aquí tu enlace de YouTube. El botón se activa cuando la URL es válida y se abre en otra pestaña.</p>
           <div class="video-actions">
             <input class="video-input" id="youtube-url" type="url" placeholder="https://www.youtube.com/watch?v=...">
             <a class="video-link disabled" id="youtube-open" href="#" target="_blank" rel="noopener noreferrer">Abrir YouTube</a>
@@ -871,7 +876,7 @@
           </div>
 
           <div class="status-banner" id="status-banner">
-            El amarillo marca spanglish. El azul claro marca glosas culturales o léxicas. Los huecos turquesa se completan al escuchar.
+            Usa Revisar todo para comprobar respuestas y los botones del estribillo para moverte por la canción.
           </div>
         </section>
 
@@ -889,7 +894,6 @@
 
         <section class="panel card table-box">
           <h2>Imperativo</h2>
-          <p class="table-note">Resumen rápido del imperativo afirmativo y negativo. El alumnado puede comparar con las formas pronominales de la canción.</p>
           <table>
             <thead>
               <tr>
@@ -1311,7 +1315,7 @@
       } else if (correct > 0) {
         statusBanner.textContent = `Buen ritmo: ${correct} exactos y ${remaining} pendientes. Los huecos turquesa conviene completarlos después de escuchar.`;
       } else {
-        statusBanner.textContent = 'El amarillo marca spanglish. El azul claro marca glosas culturales o léxicas. Los huecos turquesa se completan al escuchar.';
+        statusBanner.textContent = 'Usa Revisar todo para comprobar respuestas y los botones del estribillo para moverte por la canción.';
       }
 
       completeBanner.classList.remove('active');
