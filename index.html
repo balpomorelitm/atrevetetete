@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atrévete | Huecos de imperativo</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%BB%3C/text%3E%3C/svg%3E">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Manrope:wght@400;500;700;800&display=swap');
+
+    :root {
+      --bg-deep: #14081f;
+      --bg-mid: #2b0f3a;
+      --bg-accent: #103c47;
+      --panel: rgba(13, 11, 27, 0.78);
+      --panel-strong: rgba(20, 16, 38, 0.92);
+      --line: rgba(255, 255, 255, 0.08);
+      --text: #f4f1eb;
+      --muted: #cdbfd9;
+      --accent: #ff7a59;
+      --accent-2: #1fd3b2;
+      --accent-3: #ffd166;
+      --ok: #44d17a;
+      --bad: #ff5f6d;
+      --tilde: #61b8ff;
+      --listening: #8ef0dc;
+      --shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
+      --radius: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Manrope', 'Segoe UI', sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255, 122, 89, 0.22), transparent 30%),
+        radial-gradient(circle at 85% 15%, rgba(31, 211, 178, 0.18), transparent 26%),
+        linear-gradient(135deg, var(--bg-deep), var(--bg-mid) 52%, var(--bg-accent));
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(circle at center, black 45%, transparent 85%);
+      opacity: 0.35;
+    }
+
+    .shell {
+      width: min(1320px, calc(100% - 26px));
+      margin: 0 auto;
+      padding: 22px 0 48px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 34px clamp(22px, 4vw, 42px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 32px;
+      background:
+        linear-gradient(140deg, rgba(255, 122, 89, 0.18), rgba(31, 211, 178, 0.08) 45%, rgba(10, 9, 23, 0.25)),
+        var(--panel-strong);
+      box-shadow: var(--shadow);
+      isolation: isolate;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      right: -80px;
+      top: -60px;
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(255, 209, 102, 0.28), transparent 68%);
+      transform: rotate(12deg);
+      z-index: -1;
+    }
+
+    .kicker {
+      margin: 0 0 10px;
+      font-size: 0.82rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--accent-3);
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+      font-size: clamp(3.2rem, 9vw, 6rem);
+      line-height: 0.92;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+    }
+
+    .hero-line {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--accent-2);
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+    }
+
+    .hero p {
+      max-width: 78ch;
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: 0.96rem;
+      line-height: 1.65;
+    }
+
+    .hero p strong {
+      color: var(--text);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.42fr) minmax(280px, 0.58fr);
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .exercise-panel {
+      padding: 20px;
+    }
+
+    .sidebar {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .sticky-tools {
+      position: sticky;
+      top: 16px;
+    }
+
+    .card {
+      padding: 18px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 16px;
+    }
+
+    .section-title h2,
+    .sidebar h2 {
+      margin: 0;
+      font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+      font-size: 1.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .subtitle,
+    .card p,
+    .table-note,
+    .link-help {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    button,
+    .video-link {
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 11px 17px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 800;
+      transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+      text-decoration: none;
+    }
+
+    button.primary,
+    .video-link {
+      color: #160d20;
+      background: linear-gradient(135deg, var(--accent), var(--accent-3));
+      box-shadow: 0 10px 24px rgba(255, 122, 89, 0.32);
+    }
+
+    button.secondary {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    button:hover,
+    .video-link:hover {
+      transform: translateY(-2px);
+    }
+
+    button:active,
+    .video-link:active {
+      transform: translateY(0);
+    }
+
+    button:disabled,
+    .video-link.disabled {
+      cursor: default;
+      opacity: 0.55;
+      transform: none;
+      box-shadow: none;
+      pointer-events: none;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+      font-weight: 700;
+      user-select: none;
+      font-size: 0.9rem;
+    }
+
+    .toggle input {
+      accent-color: var(--accent-2);
+    }
+
+    .lyrics-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .line-card {
+      display: grid;
+      grid-template-columns: 50px minmax(0, 1fr) minmax(170px, 215px);
+      gap: 12px;
+      align-items: start;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .line-card.pending:hover,
+    .line-card.has-gap:hover,
+    .line-card.reference-line:hover {
+      transform: translateX(4px);
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .line-card.completed {
+      border-color: rgba(68, 209, 122, 0.25);
+      background: rgba(68, 209, 122, 0.08);
+    }
+
+    .line-card.incorrect {
+      border-color: rgba(255, 95, 109, 0.25);
+      background: rgba(255, 95, 109, 0.07);
+    }
+
+    .line-card.accent-state {
+      border-color: rgba(97, 184, 255, 0.34);
+      background: rgba(58, 110, 196, 0.09);
+    }
+
+    .line-card.section-card,
+    .line-card.reference-line {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .line-index {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 40px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--accent-3);
+      font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+      font-size: 1.12rem;
+      letter-spacing: 0.08em;
+      text-align: center;
+      padding: 0 6px;
+    }
+
+    .line-main {
+      font-size: 0.95rem;
+      line-height: 1.65;
+      word-break: break-word;
+    }
+
+    .line-main strong {
+      color: var(--accent-3);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-size: 0.88rem;
+    }
+
+    .line-main input,
+    .video-input {
+      margin: 0 4px;
+      padding: 8px 11px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(7, 8, 18, 0.82);
+      color: var(--text);
+      font: inherit;
+      transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+    }
+
+    .line-main input {
+      width: clamp(98px, 17vw, 154px);
+      text-align: center;
+    }
+
+    .video-input {
+      width: 100%;
+      margin: 0;
+      text-align: left;
+    }
+
+    .line-main input::placeholder,
+    .video-input::placeholder {
+      color: rgba(255, 255, 255, 0.28);
+    }
+
+    .line-main input:focus,
+    .video-input:focus {
+      outline: none;
+      border-color: rgba(31, 211, 178, 0.8);
+      box-shadow: 0 0 0 4px rgba(31, 211, 178, 0.12);
+    }
+
+    .line-main input.listening-blank {
+      border-color: rgba(142, 240, 220, 0.55);
+      background: rgba(13, 43, 47, 0.95);
+    }
+
+    .line-main input.correct {
+      border-color: rgba(68, 209, 122, 0.8);
+      background: rgba(17, 49, 33, 0.95);
+      box-shadow: 0 0 0 4px rgba(68, 209, 122, 0.12);
+    }
+
+    .line-main input.wrong {
+      border-color: rgba(255, 95, 109, 0.8);
+      background: rgba(66, 14, 20, 0.95);
+      box-shadow: 0 0 0 4px rgba(255, 95, 109, 0.12);
+    }
+
+    .line-main input.accent-missing {
+      border-color: rgba(97, 184, 255, 0.92);
+      background: rgba(19, 38, 82, 0.95);
+      box-shadow: 0 0 0 4px rgba(97, 184, 255, 0.14);
+      color: #dcefff;
+    }
+
+    .line-main input.hint {
+      animation: pulse 900ms ease;
+    }
+
+    .echo {
+      color: var(--accent-3);
+      font-weight: 800;
+    }
+
+    .clues {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      justify-content: flex-start;
+      align-content: start;
+    }
+
+    .action-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .jump-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-size: 0.79rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+    }
+
+    .jump-link:hover,
+    .jump-link:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(255, 209, 102, 0.45);
+      background: rgba(255, 209, 102, 0.14);
+      outline: none;
+    }
+
+    .clue-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--muted);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.8rem;
+      line-height: 1.28;
+    }
+
+    .clue-chip.grammar {
+      color: #f6e8d8;
+      background: rgba(255, 122, 89, 0.12);
+      border-color: rgba(255, 122, 89, 0.2);
+    }
+
+    .clue-chip.listening {
+      color: #dffaf5;
+      background: rgba(31, 211, 178, 0.12);
+      border-color: rgba(31, 211, 178, 0.22);
+    }
+
+    .clue-chip.gloss {
+      color: #deefff;
+      background: rgba(97, 184, 255, 0.12);
+      border-color: rgba(97, 184, 255, 0.25);
+    }
+
+    .clue-chip.section {
+      color: #fff1c4;
+      background: rgba(255, 209, 102, 0.12);
+      border-color: rgba(255, 209, 102, 0.24);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .spanglish,
+    .gloss-word {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 5px;
+      margin: 0 1px;
+      border-radius: 7px;
+      font-weight: 800;
+      cursor: help;
+    }
+
+    .spanglish {
+      color: #16121c;
+      background: linear-gradient(135deg, rgba(255, 209, 102, 0.95), rgba(255, 122, 89, 0.95));
+    }
+
+    .gloss-word {
+      color: #071324;
+      background: linear-gradient(135deg, rgba(97, 184, 255, 0.96), rgba(164, 223, 255, 0.96));
+    }
+
+    .spanglish::after,
+    .gloss-word::after {
+      content: attr(data-meaning);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 10px);
+      transform: translateX(-50%) translateY(6px);
+      width: max-content;
+      max-width: min(280px, 80vw);
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(7, 8, 18, 0.95);
+      color: var(--text);
+      font-size: 0.78rem;
+      line-height: 1.4;
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+      transition: opacity 140ms ease, transform 140ms ease;
+      white-space: normal;
+      z-index: 8;
+    }
+
+    .spanglish:hover::after,
+    .spanglish:focus-visible::after,
+    .gloss-word:hover::after,
+    .gloss-word:focus-visible::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .stat {
+      padding: 12px 10px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.45rem;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.74rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .progress-wrap {
+      margin-top: 14px;
+    }
+
+    .progress-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .progress-bar {
+      position: relative;
+      height: 12px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .progress-fill {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--accent-3), var(--accent-2));
+      transition: width 220ms ease;
+    }
+
+    .status-banner {
+      margin-top: 14px;
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: rgba(31, 211, 178, 0.08);
+      border: 1px solid rgba(31, 211, 178, 0.18);
+      color: var(--text);
+      line-height: 1.5;
+      font-size: 0.9rem;
+    }
+
+    .legend-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+    }
+
+    .legend-item.tilde {
+      color: #e3f2ff;
+      background: rgba(97, 184, 255, 0.12);
+    }
+
+    .legend-item.listening {
+      color: #dcfff6;
+      background: rgba(31, 211, 178, 0.12);
+    }
+
+    .legend-item.gloss {
+      color: #deefff;
+      background: rgba(97, 184, 255, 0.18);
+    }
+
+    .legend-item.spanglish-tone {
+      color: #21180b;
+      background: linear-gradient(135deg, rgba(255, 209, 102, 0.95), rgba(255, 122, 89, 0.95));
+    }
+
+    .video-box,
+    .controls-box,
+    .legend-box,
+    .table-box {
+      display: grid;
+      gap: 12px;
+    }
+
+    .video-actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.83rem;
+      color: var(--text);
+      overflow: hidden;
+      border-radius: 14px;
+    }
+
+    th,
+    td {
+      padding: 9px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-3);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .complete-banner {
+      display: none;
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(68, 209, 122, 0.18), rgba(31, 211, 178, 0.18));
+      border: 1px solid rgba(68, 209, 122, 0.22);
+      font-weight: 700;
+      color: var(--text);
+      font-size: 0.92rem;
+    }
+
+    .complete-banner.active {
+      display: block;
+      animation: fadeInUp 340ms ease;
+    }
+
+    .confetti {
+      position: fixed;
+      top: -20px;
+      width: 10px;
+      height: 18px;
+      border-radius: 3px;
+      opacity: 0.9;
+      pointer-events: none;
+      animation: fall linear forwards;
+      z-index: 40;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 209, 102, 0.4); }
+      100% { box-shadow: 0 0 0 10px rgba(255, 209, 102, 0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fall {
+      to {
+        transform: translate3d(var(--drift), 110vh, 0) rotate(var(--spin));
+        opacity: 0.05;
+      }
+    }
+
+    @media (max-width: 1040px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sticky-tools {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .shell {
+        width: min(100% - 18px, 1000px);
+        padding-top: 16px;
+      }
+
+      .exercise-panel,
+      .card {
+        padding: 16px;
+      }
+
+      .line-card {
+        grid-template-columns: 1fr;
+      }
+
+      .line-index {
+        width: fit-content;
+        min-width: 58px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .toolbar {
+        flex-direction: column;
+      }
+
+      .toolbar button,
+      .toggle,
+      .video-link {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .line-main input {
+        width: 100%;
+        margin: 6px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero panel">
+      <p class="kicker">Calle 13 x Imperativos</p>
+      <h1>Atrévete</h1>
+      <span class="hero-line">Imperativos primero, escucha después</span>
+      <p>
+        <strong>Calle 13</strong> fue un proyecto musical puertorriqueño liderado por Residente y Visitante, conocido por mezclar reguetón, rap y crítica social con un lenguaje muy creativo. En esta actividad, primero se completan los <strong>imperativos</strong> y después los huecos de <strong>escucha</strong>. Además, se distinguen los préstamos del inglés y varias glosas culturales del español caribeño.
+      </p>
+    </section>
+
+    <div class="layout">
+      <section class="panel exercise-panel">
+        <div class="section-title">
+          <div>
+            <h2>Letra interactiva</h2>
+            <p class="subtitle">Huecos normales para conjugar. Huecos turquesa para completar tras escuchar la canción. Si falta una tilde, la respuesta se marca en azul.</p>
+          </div>
+        </div>
+
+        <div class="toolbar" aria-label="Controles de la actividad">
+          <button class="primary" id="check-all" type="button">Revisar todo</button>
+          <button class="secondary" id="hint-btn" type="button">Dar una pista</button>
+          <button class="secondary" id="reset-btn" type="button">Reiniciar</button>
+          <label class="toggle" for="pending-only">
+            <input id="pending-only" type="checkbox">
+            Solo pendientes
+          </label>
+        </div>
+
+        <div class="lyrics-list" id="lyrics-list"></div>
+
+        <div class="complete-banner" id="complete-banner">
+          Actividad completada. Los imperativos y los huecos de escucha están resueltos con tilde cuando corresponde.
+        </div>
+      </section>
+
+      <aside class="sidebar sticky-tools">
+        <section class="panel card video-box">
+          <h2>Vídeo</h2>
+          <p class="link-help">Pega aquí tu enlace de YouTube. El botón se activa cuando la URL es válida y se abre en otra pestaña.</p>
+          <div class="video-actions">
+            <input class="video-input" id="youtube-url" type="url" placeholder="https://www.youtube.com/watch?v=...">
+            <a class="video-link disabled" id="youtube-open" href="#" target="_blank" rel="noopener noreferrer">Abrir YouTube</a>
+          </div>
+        </section>
+
+        <section class="panel card controls-box">
+          <h2>Progreso</h2>
+          <p>El verde cuenta solo las respuestas exactas. El azul indica que la forma verbal es correcta, pero falta la tilde.</p>
+          <div class="stats-grid">
+            <div class="stat">
+              <strong id="done-count">0</strong>
+              <span>Exactos</span>
+            </div>
+            <div class="stat">
+              <strong id="accent-count">0</strong>
+              <span>Sin tilde</span>
+            </div>
+            <div class="stat">
+              <strong id="remaining-count">0</strong>
+              <span>Pendientes</span>
+            </div>
+            <div class="stat">
+              <strong id="errors-count">0</strong>
+              <span>Errores</span>
+            </div>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-head">
+              <span id="progress-label">0 de 0 exactos</span>
+              <span id="progress-percent">0%</span>
+            </div>
+            <div class="progress-bar" aria-hidden="true">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+          </div>
+
+          <div class="status-banner" id="status-banner">
+            El amarillo marca spanglish. El azul claro marca glosas culturales o léxicas. Los huecos turquesa se completan al escuchar.
+          </div>
+        </section>
+
+        <section class="panel card legend-box">
+          <h2>Leyenda</h2>
+          <p>Las pistas de la derecha ayudan a comentar gramática, léxico y contexto cultural sin salir de la letra.</p>
+          <div class="legend-list">
+            <span class="legend-item">Imperativos</span>
+            <span class="legend-item listening">Huecos de escucha</span>
+            <span class="legend-item tilde">Falta tilde</span>
+            <span class="legend-item gloss">Glosa cultural</span>
+            <span class="legend-item spanglish-tone">Spanglish</span>
+          </div>
+        </section>
+
+        <section class="panel card table-box">
+          <h2>Imperativo</h2>
+          <p class="table-note">Resumen rápido del imperativo afirmativo y negativo. El alumnado puede comparar con las formas pronominales de la canción.</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Persona</th>
+                <th>Afirmativo</th>
+                <th>Negativo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>tú</td>
+                <td>habla / levántate</td>
+                <td>no hables / no te levantes</td>
+              </tr>
+              <tr>
+                <td>usted</td>
+                <td>hable / levántese</td>
+                <td>no hable / no se levante</td>
+              </tr>
+              <tr>
+                <td>vosotros</td>
+                <td>hablad / levantaos</td>
+                <td>no habléis / no os levantéis</td>
+              </tr>
+              <tr>
+                <td>ustedes</td>
+                <td>hablen / levántense</td>
+                <td>no hablen / no se levanten</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const sp = (text, meaning) => ({ type: 'spanglish', text, meaning });
+    const gl = (text, meaning) => ({ type: 'gloss', text, meaning });
+    const note = (text, tone = 'grammar') => ({ text, tone });
+    const blank = (answer, clue, options = {}) => ({
+      type: 'blank',
+      answer,
+      clue,
+      mode: options.mode || 'grammar',
+      width: options.width || answer.length + 1,
+      placeholder: options.placeholder || (options.mode === 'listening' ? 'escucha' : 'escribe')
+    });
+
+    const chorus = [
+      { lineNumber: '01', kind: 'prompt', parts: [blank('atrévete', 'atreverse · tú · pronominal', { width: 11 }), { type: 'echo', text: '-te-te' }, ', ', blank('salte', 'salir/salirse · tú + te · uso coloquial', { width: 8 }), ' del ', sp('closet', 'armario / clóset')], notes: [note('Estribillo', 'section'), note('atreverse · tú · pronominal'), note('salir/salirse · tú + te', 'grammar')] },
+      { lineNumber: '02', kind: 'prompt', parts: [blank('destápate', 'destaparse · tú · pronominal', { width: 11 }), ', ', blank('quítate', 'quitarse · tú · pronominal', { width: 9 }), ' el esmalte'], notes: [note('destaparse · tú', 'grammar'), note('quitarse · tú', 'grammar')] },
+      { lineNumber: '03', kind: 'prompt', parts: [blank('deja', 'dejar · tú', { width: 7 }), ' de taparte'], notes: [note('dejar · tú', 'grammar')] },
+      { lineNumber: '04', kind: 'text', parts: ['Que nadie va a retratarte'], notes: [note('direct, challenging tone', 'gloss')] },
+      { lineNumber: '05', kind: 'prompt', parts: [blank('levántate', 'levantarse · tú · pronominal', { width: 11 }), ', ', blank('ponte', 'ponerse · tú · pronominal', { width: 8 }), ' ', sp('hyper', 'muy activada / acelerada')], notes: [note('levantarse · tú', 'grammar'), note('ponerse · tú', 'grammar')] },
+      { lineNumber: '06', kind: 'prompt', parts: [blank('préndete', 'prenderse · tú · pronominal', { width: 10 }), ', ', blank('sácale', 'sacarle · tú + le', { width: 9 }), ' chispas al ', sp('starter', 'arranque / motor de inicio')], notes: [note('prenderse · tú', 'grammar'), note('sacarle · tú + le', 'grammar')] },
+      { lineNumber: '07', kind: 'prompt', parts: [blank('préndete', 'prenderse · tú · pronominal', { width: 10 }), ' en fuego como un ', sp('lighter', 'mechero / encendedor')], notes: [note('prenderse · tú', 'grammar')] },
+      { lineNumber: '08', kind: 'prompt', parts: [blank('sacúdete', 'sacudirse · tú · pronominal', { width: 10 }), ' el sudor como si fueras un ', sp('wiper', 'limpiaparabrisas')], notes: [note('sacudirse · tú', 'grammar')] },
+      {
+        lineNumber: '09',
+        kind: 'text',
+        anchorId: 'chorus-end',
+        parts: ['Que tú eres callejera, ', sp('Street Fighter', 'Video game reference: she is framed as bold, tough, and ready for action.')],
+        notes: [note('pop culture reference', 'gloss')],
+        actions: [
+          { label: 'Go to 29-37', target: '#chorus-ref-1' },
+          { label: 'Go to 56-64', target: '#chorus-ref-2' },
+          { label: 'Go to 65-73', target: '#chorus-ref-3' }
+        ]
+      }
+    ];
+
+    const verseOne = [
+      { lineNumber: '10', kind: 'prompt', parts: [blank('cambia', 'cambiar · tú', { width: 9 }), ' esa cara de seria'], notes: [note('cambiar · tú', 'grammar')] },
+      { lineNumber: '11', kind: 'prompt', parts: ['Esa cara de ', blank('intelectual', 'escucha la palabra clave', { mode: 'listening', width: 13 }), ', de enciclopedia'], notes: [note('Hueco de escucha', 'listening'), note('bookish, serious image', 'gloss')] },
+      { lineNumber: '12', kind: 'text', parts: ['Que te voy a inyectar con la bacteria'], notes: [note('provocative metaphor', 'gloss')] },
+      { lineNumber: '13', kind: 'text', parts: ['Pa\' que de\' vuelta\' como machina de feria'], notes: [note('fairground spinning image', 'gloss')] },
+      { lineNumber: '14', kind: 'text', parts: ['Señorita intelectual, ya sé que tiene el area abdominal'], notes: [note('mind versus body contrast', 'gloss')] },
+      { lineNumber: '15', kind: 'prompt', parts: ['Que va a ', blank('explotar', 'escucha el infinitivo', { mode: 'listening', width: 10 }), ' como fiesta patronal'], notes: [note('Hueco de escucha', 'listening'), note('local town festival image', 'gloss')] },
+      { lineNumber: '16', kind: 'prompt', parts: ['Que va ', blank('explotar', 'escucha el infinitivo otra vez', { mode: 'listening', width: 10 }), ', como palestino'], notes: [note('Hueco de escucha', 'listening'), note('repeated for emphasis', 'gloss')] },
+      { lineNumber: '17', kind: 'text', parts: ['Yo sé que a ti te gusta el ', sp('pop-rock', 'pop rock music style'), ' latino'], notes: [note('music reference', 'gloss')] },
+      { lineNumber: '18', kind: 'text', parts: ['Pero este reguetón se te mete por los intestinos'], notes: [note('the beat hits physically', 'gloss')] },
+      { lineNumber: '19', kind: 'prompt', parts: ['Por debajo de la ', blank('falda', 'escucha el sustantivo', { mode: 'listening', width: 8 }), ' como un submarino'], notes: [note('Hueco de escucha', 'listening')] },
+      { lineNumber: '20', kind: 'text', parts: ['Y te saca lo de indio taíno'], notes: [note('Taíno identity reference', 'gloss')] },
+      { lineNumber: '21', kind: 'text', parts: ['Ya tú sabes en ', gl('taparrabo', 'A loincloth: a very minimal garment, linked here to Indigenous imagery and sensuality.'), ', mamá'], notes: [note('cultural note', 'gloss')] },
+      { lineNumber: '22', kind: 'text', parts: ['En el nombre de ', gl('Agüeybaná', 'An important Taíno leader from Puerto Rico. The line invokes Indigenous heritage.'), ', no hay más na\''], notes: [note('Taíno cultural reference', 'gloss')] },
+      { lineNumber: '23', kind: 'text', parts: ['Para na\' que yo te vo\'a mentir'], notes: [note('Caribbean Spanish contraction', 'gloss')] },
+      { lineNumber: '24', kind: 'prompt', parts: ['Yo sé que yo también quiero ', blank('consumir', 'escucha el verbo', { mode: 'listening', width: 10 }), ' de tu perejil'], notes: [note('Hueco de escucha', 'listening'), note('here it suggests desire, appetite, or enjoyment', 'gloss')] },
+      { lineNumber: '25', kind: 'text', parts: ['Y tú viniste amazónica como Brasil'], notes: [note('hyperbolic, exotic image', 'gloss')] },
+      { lineNumber: '26', kind: 'text', parts: ['Tú viniste a mata\'la como ', gl('Kill Bill', 'Reference to the film: she arrives fierce, stylish, and ready to dominate the scene.')], notes: [note('film and pop culture reference', 'gloss')] },
+      { lineNumber: '27', kind: 'prompt', parts: ['Tú viniste a beber ', blank('cerveza', 'escucha la bebida', { mode: 'listening', width: 9 }), ' de barril'], notes: [note('Hueco de escucha', 'listening'), note('draft beer served from a keg or barrel', 'gloss')] },
+      { lineNumber: '28', kind: 'text', parts: ['Tú sabes que conmigo tienes ', sp('refill', 'relleno / recarga / otra ronda')], notes: [note('spanglish de consumo', 'gloss')] }
+    ];
+
+    const verseTwo = [
+      { lineNumber: '38', kind: 'prompt', parts: [sp('Hello', 'hola'), ', ', blank('deja', 'dejar · tú', { width: 7 }), ' el ', sp('show', 'espectáculo / numerito')], notes: [note('dejar · tú', 'grammar')] },
+      { lineNumber: '39', kind: 'prompt', parts: [blank('súbete', 'subirse · tú · pronominal', { width: 9 }), ' la minifalda hasta la espalda'], notes: [note('subirse · tú', 'grammar')] },
+      { lineNumber: '40', kind: 'prompt', parts: [blank('súbetela', 'subírsela · tú · pronominal + la', { width: 11 }), ' ', blank('deja', 'dejar · tú', { width: 7 }), ' el ', sp('show', 'espectáculo / numerito'), ', más alta'], notes: [note('subírsela · tú + la', 'grammar'), note('dejar · tú', 'grammar')] },
+      { lineNumber: '41', kind: 'text', parts: ['Que ahora vamos a bailar por to\'a la jalda'], notes: [note('slope or hillside image', 'gloss')] },
+      { lineNumber: '42', kind: 'text', parts: ['Mera, nena ¿quieres un ', sp('sipi', 'sorbo / traguito'), '?'], notes: [note('playful phonetic slang', 'gloss')] },
+      { lineNumber: '43', kind: 'text', parts: ['No importa si eres rapera o eres ', sp('hippie', 'hippie / alternativa')], notes: [note('open to different styles', 'gloss')] },
+      { lineNumber: '44', kind: 'text', parts: ['Si eres de ', gl('Bayamón', 'Bayamón is a Puerto Rican city often linked with a more working-class, urban image.'), ' o de ', gl('Guaynabo', 'Guaynabo is often associated with a wealthier, suburban image in Puerto Rico.'), ' ', sp('City', 'ciudad')], notes: [note('social contrast inside Puerto Rico', 'gloss')] },
+      { lineNumber: '45', kind: 'prompt', parts: ['Conmigo ', blank('no te pongas', 'ponerse · imperativo negativo · tú + te', { width: 14 }), ' ', sp('picky', 'quisquillosa / tiquismiquis')], notes: [note('imperativo negativo', 'grammar')] },
+      { lineNumber: '46', kind: 'prompt', parts: ['Esto es hasta abajo, ', blank('cógele', 'cogerle · tú + le', { width: 9 }), ' el triqui'], notes: [note('cogerle · tú + le', 'grammar'), note('spelled with g, from coger', 'gloss')] },
+      { lineNumber: '47', kind: 'text', parts: ['Esto es fácil, esto es un ', gl('mamey', 'In Caribbean Spanish, mamey means something very easy.')], notes: [note('vocabulary note', 'gloss')] },
+      { lineNumber: '48', kind: 'text', parts: ['¿Qué importa si te gusta ', sp('Green Day', 'grupo estadounidense de punk rock'), '?'], notes: [note('referencia musical anglófona', 'gloss')] },
+      { lineNumber: '49', kind: 'text', parts: ['¿Qué importa si te gusta ', sp('Coldplay', 'grupo británico de pop rock'), '?'], notes: [note('referencia musical anglófona', 'gloss')] },
+      { lineNumber: '50', kind: 'text', parts: ['Esto es directo sin parar, ', sp('one way', 'en una sola dirección / sin vuelta atrás')], notes: [note('moving only forward', 'gloss')] },
+      { lineNumber: '51', kind: 'text', parts: ['Yo te lo juro de que por ley'], notes: [note('strong emphatic phrase', 'gloss')] },
+      { lineNumber: '52', kind: 'text', parts: ['Aquí to\'as ', gl('boricuas', 'Boricua is an affectionate way to say Puerto Rican.'), ' saben karate'], notes: [note('Puerto Rican identity', 'gloss')] },
+      { lineNumber: '53', kind: 'text', parts: ['Ellas cocinan con salsa de tomate'], notes: [note('everyday domestic image', 'gloss')] },
+      { lineNumber: '54', kind: 'prompt', parts: ['Mojan el ', blank('arroz', 'escucha el alimento', { mode: 'listening', width: 7 }), ' con un poco de aguacate'], notes: [note('Hueco de escucha', 'listening'), note('ordinary Caribbean food scene', 'gloss')] },
+      { lineNumber: '55', kind: 'text', parts: ['Pa\' cosechar nalgas de 14 kilates'], notes: [note('comic exaggeration', 'gloss')] }
+    ];
+
+    const song = [
+      { kind: 'section', lineNumber: '♪', anchorId: 'chorus-start', parts: ['<strong>Estribillo</strong>'], notes: [note('El estribillo aparece completo solo al principio', 'section')], actions: [{ label: 'Jump to chorus end', target: '#chorus-end' }] },
+      ...chorus,
+      ...verseOne,
+      { kind: 'reference', lineNumber: '29-37', anchorId: 'chorus-ref-1', parts: ['[Estribillo: repite las líneas 1-9]'], notes: [note('Referencia al estribillo', 'section')], actions: [{ label: 'Back to full chorus', target: '#chorus-start' }] },
+      ...verseTwo,
+      { kind: 'reference', lineNumber: '56-64', anchorId: 'chorus-ref-2', parts: ['[Estribillo: vuelve a repetirse]'], notes: [note('Referencia al estribillo', 'section')], actions: [{ label: 'Back to full chorus', target: '#chorus-start' }] },
+      { kind: 'reference', lineNumber: '65-73', anchorId: 'chorus-ref-3', parts: ['[Estribillo: repetición final]'], notes: [note('Referencia al estribillo', 'section')], actions: [{ label: 'Back to full chorus', target: '#chorus-start' }] },
+      { lineNumber: '74', kind: 'text', parts: ['Ja-ja-ja'], notes: [note('performed laugh', 'gloss')] },
+      { lineNumber: '75', kind: 'text', parts: ['¡Ah!'], notes: [note('final exclamation', 'gloss')] },
+      { lineNumber: '76', kind: 'text', parts: ['Cumbia'], notes: [note('rhythmic closing tag', 'gloss')] }
+    ];
+
+    const lyricsList = document.getElementById('lyrics-list');
+    const doneCount = document.getElementById('done-count');
+    const accentCount = document.getElementById('accent-count');
+    const remainingCount = document.getElementById('remaining-count');
+    const errorsCount = document.getElementById('errors-count');
+    const progressLabel = document.getElementById('progress-label');
+    const progressPercent = document.getElementById('progress-percent');
+    const progressFill = document.getElementById('progress-fill');
+    const statusBanner = document.getElementById('status-banner');
+    const completeBanner = document.getElementById('complete-banner');
+    const checkAllButton = document.getElementById('check-all');
+    const hintButton = document.getElementById('hint-btn');
+    const resetButton = document.getElementById('reset-btn');
+    const pendingOnlyToggle = document.getElementById('pending-only');
+    const youtubeUrl = document.getElementById('youtube-url');
+    const youtubeOpen = document.getElementById('youtube-open');
+
+    const inputMeta = [];
+    let celebrationLaunched = false;
+
+    const sanitizeSpaces = (value) => value
+      .toLowerCase()
+      .replace(/[’']/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const exactNormalize = (value) => sanitizeSpaces(value.normalize('NFC'));
+    const baseNormalize = (value) => sanitizeSpaces(value.normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
+
+    const renderPart = (part, lineNumber, inputIndex, lineCard) => {
+      if (typeof part === 'string') {
+        if (part.startsWith('<strong>')) {
+          const wrapper = document.createElement('span');
+          wrapper.innerHTML = part;
+          return wrapper;
+        }
+        return document.createTextNode(part);
+      }
+
+      if (part.type === 'spanglish' || part.type === 'gloss') {
+        const span = document.createElement('span');
+        span.className = part.type === 'spanglish' ? 'spanglish' : 'gloss-word';
+        span.textContent = part.text;
+        span.dataset.meaning = part.meaning;
+        span.tabIndex = 0;
+        span.setAttribute('aria-label', `${part.text}: ${part.meaning}`);
+        return span;
+      }
+
+      if (part.type === 'echo') {
+        const span = document.createElement('span');
+        span.className = 'echo';
+        span.textContent = part.text;
+        return span;
+      }
+
+      if (part.type === 'blank') {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.autocomplete = 'off';
+        input.spellcheck = false;
+        input.placeholder = part.placeholder;
+        input.setAttribute('aria-label', `Línea ${lineNumber}, hueco ${inputIndex}: ${part.clue}`);
+        input.style.setProperty('max-width', `${Math.max(part.width, 7)}ch`);
+
+        if (part.mode === 'listening') {
+          input.classList.add('listening-blank');
+        }
+
+        const meta = {
+          input,
+          answer: part.answer,
+          clue: part.clue,
+          lineCard,
+          mode: part.mode,
+          placeholder: part.placeholder,
+          requiresAccent: exactNormalize(part.answer) !== baseNormalize(part.answer)
+        };
+
+        inputMeta.push(meta);
+
+        input.addEventListener('input', () => {
+          validateInput(meta);
+          updateProgress();
+          applyPendingFilter();
+        });
+
+        input.addEventListener('blur', () => {
+          validateInput(meta);
+          updateProgress();
+          applyPendingFilter();
+        });
+
+        return input;
+      }
+
+      return document.createTextNode('');
+    };
+
+    const renderNotes = (line) => {
+      const clues = document.createElement('div');
+      clues.className = 'clues';
+
+      if (line.notes && line.notes.length) {
+        line.notes.forEach((entry) => {
+          const chip = document.createElement('span');
+          chip.className = `clue-chip ${entry.tone || 'grammar'}`;
+          chip.textContent = entry.text;
+          clues.appendChild(chip);
+        });
+      }
+
+      if (line.actions && line.actions.length) {
+        const actions = document.createElement('div');
+        actions.className = 'action-links';
+
+        line.actions.forEach((entry) => {
+          const link = document.createElement('a');
+          link.className = 'jump-link';
+          link.href = entry.target;
+          link.textContent = entry.label;
+          actions.appendChild(link);
+        });
+
+        clues.appendChild(actions);
+      }
+
+      return clues;
+    };
+
+    const renderSong = () => {
+      song.forEach((line) => {
+        const card = document.createElement('article');
+        const hasGap = line.parts.some((part) => part && part.type === 'blank');
+        card.className = `line-card ${hasGap ? 'has-gap pending' : ''}`;
+
+        if (line.anchorId) {
+          card.id = line.anchorId;
+        }
+
+        if (line.kind === 'reference') {
+          card.classList.add('reference-line');
+        }
+        if (line.kind === 'section') {
+          card.classList.add('section-card');
+        }
+
+        const index = document.createElement('div');
+        index.className = 'line-index';
+        index.textContent = line.lineNumber || '•';
+
+        const main = document.createElement('div');
+        main.className = 'line-main';
+
+        let blanksInLine = 0;
+        line.parts.forEach((part) => {
+          if (part && part.type === 'blank') {
+            blanksInLine += 1;
+          }
+          main.append(renderPart(part, line.lineNumber || 'sin número', blanksInLine, card));
+        });
+
+        card.append(index, main, renderNotes(line));
+        lyricsList.appendChild(card);
+      });
+    };
+
+    const classifyAnswer = (meta) => {
+      const rawValue = meta.input.value;
+      const exactValue = exactNormalize(rawValue);
+      const baseValue = baseNormalize(rawValue);
+      const exactAnswer = exactNormalize(meta.answer);
+      const baseAnswer = baseNormalize(meta.answer);
+
+      if (!baseValue) {
+        return 'empty';
+      }
+
+      if (exactValue === exactAnswer) {
+        return 'correct';
+      }
+
+      if (meta.requiresAccent && baseValue === baseAnswer) {
+        return 'accent';
+      }
+
+      return 'wrong';
+    };
+
+    const updateLineState = (lineCard) => {
+      const inputs = [...lineCard.querySelectorAll('input[type="text"]')];
+      if (!inputs.length) {
+        return;
+      }
+
+      const allCorrect = inputs.every((input) => input.classList.contains('correct'));
+      const anyWrong = inputs.some((input) => input.classList.contains('wrong'));
+      const anyAccent = inputs.some((input) => input.classList.contains('accent-missing'));
+      const anyFilled = inputs.some((input) => input.value.trim() !== '');
+
+      lineCard.classList.toggle('completed', allCorrect);
+      lineCard.classList.toggle('incorrect', anyWrong);
+      lineCard.classList.toggle('accent-state', anyAccent && !anyWrong);
+      lineCard.classList.toggle('pending', !allCorrect && !anyWrong && !anyAccent && anyFilled);
+      lineCard.classList.toggle('has-gap', !allCorrect);
+    };
+
+    const validateInput = (meta) => {
+      const state = classifyAnswer(meta);
+
+      meta.input.classList.toggle('correct', state === 'correct');
+      meta.input.classList.toggle('accent-missing', state === 'accent');
+      meta.input.classList.toggle('wrong', state === 'wrong');
+
+      updateLineState(meta.lineCard);
+      return state;
+    };
+
+    const recount = () => {
+      const total = inputMeta.length;
+      let correct = 0;
+      let accent = 0;
+      let wrong = 0;
+
+      inputMeta.forEach((meta) => {
+        const state = classifyAnswer(meta);
+        if (state === 'correct') {
+          correct += 1;
+        } else if (state === 'accent') {
+          accent += 1;
+        } else if (state === 'wrong') {
+          wrong += 1;
+        }
+      });
+
+      return {
+        total,
+        correct,
+        accent,
+        wrong,
+        remaining: total - correct
+      };
+    };
+
+    const launchCelebration = () => {
+      for (let i = 0; i < 36; i += 1) {
+        const piece = document.createElement('span');
+        piece.className = 'confetti';
+        piece.style.left = `${Math.random() * 100}vw`;
+        piece.style.background = ['#ff7a59', '#ffd166', '#1fd3b2', '#61b8ff'][i % 4];
+        piece.style.setProperty('--drift', `${(Math.random() * 180) - 90}px`);
+        piece.style.setProperty('--spin', `${(Math.random() * 760) - 380}deg`);
+        piece.style.animationDuration = `${3.2 + Math.random() * 1.8}s`;
+        document.body.appendChild(piece);
+        piece.addEventListener('animationend', () => piece.remove(), { once: true });
+      }
+    };
+
+    const updateProgress = () => {
+      const { total, correct, accent, wrong, remaining } = recount();
+      const percent = total ? Math.round((correct / total) * 100) : 0;
+
+      doneCount.textContent = correct;
+      accentCount.textContent = accent;
+      remainingCount.textContent = remaining;
+      errorsCount.textContent = wrong;
+      progressLabel.textContent = `${correct} de ${total} exactos`;
+      progressPercent.textContent = `${percent}%`;
+      progressFill.style.width = `${percent}%`;
+
+      if (correct === total && total > 0) {
+        statusBanner.textContent = 'Todo correcto. Ya se puede comentar la diferencia entre imperativos, spanglish y glosas culturales.';
+        completeBanner.classList.add('active');
+        if (!celebrationLaunched) {
+          launchCelebration();
+          celebrationLaunched = true;
+        }
+        return;
+      }
+
+      const issues = [];
+      if (accent > 0) {
+        issues.push(`${accent} sin tilde`);
+      }
+      if (wrong > 0) {
+        issues.push(`${wrong} con error`);
+      }
+
+      if (issues.length) {
+        statusBanner.textContent = `Revisión en curso: ${issues.join(' y ')}. El azul avisa de que la forma es buena, pero la tilde sigue pendiente.`;
+      } else if (correct > 0) {
+        statusBanner.textContent = `Buen ritmo: ${correct} exactos y ${remaining} pendientes. Los huecos turquesa conviene completarlos después de escuchar.`;
+      } else {
+        statusBanner.textContent = 'El amarillo marca spanglish. El azul claro marca glosas culturales o léxicas. Los huecos turquesa se completan al escuchar.';
+      }
+
+      completeBanner.classList.remove('active');
+      celebrationLaunched = false;
+    };
+
+    const checkAll = () => {
+      inputMeta.forEach((meta) => validateInput(meta));
+      updateProgress();
+      applyPendingFilter();
+    };
+
+    const giveHint = () => {
+      const pending = inputMeta.find((meta) => classifyAnswer(meta) !== 'correct');
+      if (!pending) {
+        return;
+      }
+
+      pending.input.focus();
+      pending.input.placeholder = `${pending.answer.slice(0, 2)}...`;
+      pending.input.classList.add('hint');
+      window.setTimeout(() => pending.input.classList.remove('hint'), 900);
+      statusBanner.textContent = `Pista activada: fíjate en ${pending.clue}. Recuerda que el azul significa que falta tilde.`;
+    };
+
+    const resetAll = () => {
+      inputMeta.forEach((meta) => {
+        meta.input.value = '';
+        meta.input.placeholder = meta.placeholder;
+        meta.input.classList.remove('correct', 'wrong', 'accent-missing', 'hint');
+      });
+
+      document.querySelectorAll('.line-card').forEach((card) => {
+        card.classList.remove('completed', 'incorrect', 'pending', 'accent-state');
+        if (card.querySelector('input[type="text"]')) {
+          card.classList.add('has-gap', 'pending');
+        }
+      });
+
+      celebrationLaunched = false;
+      completeBanner.classList.remove('active');
+      updateProgress();
+      applyPendingFilter();
+    };
+
+    const applyPendingFilter = () => {
+      const pendingOnly = pendingOnlyToggle.checked;
+      document.querySelectorAll('.line-card').forEach((card) => {
+        const inputs = [...card.querySelectorAll('input[type="text"]')];
+        if (!inputs.length) {
+          card.hidden = false;
+          return;
+        }
+
+        const allCorrect = inputs.every((input) => input.classList.contains('correct'));
+        card.hidden = pendingOnly && allCorrect;
+      });
+    };
+
+    const syncYoutubeLink = () => {
+      const value = youtubeUrl.value.trim();
+      const valid = /^https?:\/\//i.test(value);
+
+      if (valid) {
+        youtubeOpen.href = value;
+        youtubeOpen.classList.remove('disabled');
+      } else {
+        youtubeOpen.href = '#';
+        youtubeOpen.classList.add('disabled');
+      }
+
+      try {
+        window.localStorage.setItem('atrevete-youtube-url', value);
+      } catch (error) {
+        void error;
+      }
+    };
+
+    renderSong();
+
+    try {
+      const savedUrl = window.localStorage.getItem('atrevete-youtube-url');
+      if (savedUrl) {
+        youtubeUrl.value = savedUrl;
+      } else {
+        youtubeUrl.value = 'https://youtu.be/vXtJkDHEAAc?si=D1vNmas7L5zUDvEV';
+      }
+    } catch (error) {
+      void error;
+      youtubeUrl.value = 'https://youtu.be/vXtJkDHEAAc?si=D1vNmas7L5zUDvEV';
+    }
+
+    syncYoutubeLink();
+    updateProgress();
+
+    checkAllButton.addEventListener('click', checkAll);
+    hintButton.addEventListener('click', giveHint);
+    resetButton.addEventListener('click', resetAll);
+    pendingOnlyToggle.addEventListener('change', applyPendingFilter);
+    youtubeUrl.addEventListener('input', syncYoutubeLink);
+  </script>
+</body>
+</html>
